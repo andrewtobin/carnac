@@ -11,7 +11,7 @@
         Left="0"
         WindowStyle="None"
         SnapsToDevicePixels="True"
-        FontSize="40"
+        FontSize="{Binding Settings.FontSize}"
         Focusable="False"
         Topmost="True">
     <Window.Resources>
@@ -28,23 +28,28 @@
               Focusable="False" 
               IsHitTestVisible="False"
               BorderBrush="Transparent"
-              BorderThickness="0">
+              BorderThickness="0"
+              ScrollViewer.VerticalScrollBarVisibility="Hidden"
+              ScrollViewer.HorizontalScrollBarVisibility="Hidden">
         <ListView.LayoutTransform>
             <ScaleTransform ScaleY="-1" />
         </ListView.LayoutTransform>
         <ListView.ItemTemplate>
             <DataTemplate>
-                <Border Opacity="0.5" 
-                        x:Name="Border"
-                        BorderBrush="Black" 
-                        IsHitTestVisible="False" 
+                <Border Opacity="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}},Path=DataContext.Settings.ItemOpacity}"
+                        x:Name="Border" IsHitTestVisible="False" 
                         Focusable="False"
                         HorizontalAlignment="Stretch" 
                         BorderThickness="4"
                         CornerRadius="2" Margin="0, 0, 0, 3"
-                        Padding="2" 
-                        Background="Black">
-                    <Border.Style>
+                        Padding="2">
+                  <Border.Background>
+                        <SolidColorBrush Color="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=DataContext.Settings.ItemBackgroundColor}" />
+                    </Border.Background>
+                  <Border.BorderBrush>
+                      <SolidColorBrush Color="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=DataContext.Settings.ItemBackgroundColor}" />
+                  </Border.BorderBrush>
+                  <Border.Style>
                         <Style>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsDeleting}" Value="True">
@@ -64,16 +69,17 @@
                     </Border.LayoutTransform>
                     <TextBlock
                         x:Name="Text"
-                        MaxWidth="250"
-                        HorizontalAlignment="Stretch" 
-                        Foreground="White"
-                        FontWeight="Bold" 
+                        MaxWidth="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}},Path=DataContext.Settings.ItemMaxWidth}"
+                        HorizontalAlignment="Stretch" FontWeight="Bold" 
                         Text="{Binding Text}"
                         Focusable="False" 
                         IsHitTestVisible="False" 
                         TextWrapping="Wrap" >
-                        <TextBlock.Background>
-                            <SolidColorBrush Color="Black" Opacity="0.5" />
+                      <TextBlock.Foreground>
+                        <SolidColorBrush Color="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=DataContext.Settings.FontColor}" />
+                      </TextBlock.Foreground>
+                      <TextBlock.Background>
+                            <SolidColorBrush Color="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}},Path=DataContext.Settings.ItemBackgroundColor}" Opacity="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}},Path=DataContext.Settings.ItemOpacity}" />
                         </TextBlock.Background>
                     </TextBlock>
 

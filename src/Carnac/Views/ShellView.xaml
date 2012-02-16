@@ -66,7 +66,6 @@
             </ItemsControl>
         </TabItem>
         <TabItem Header="Recording">
-            <TextBlock x:Name="CurrentMessage_Text" Foreground="White" Background="DarkBlue" HorizontalAlignment="Stretch" Width="200"/>
         </TabItem>
         <TabItem Header="Appearance"/>
         <TabItem Header="About"/>

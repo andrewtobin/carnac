@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using Carnac.KeyMonitor;
 using System.ComponentModel.Composition;
+using Color = System.Windows.Media.Color;
 using Message = Carnac.Models.Message;
 using Timer = System.Timers.Timer;
 
@@ -90,8 +93,20 @@ namespace Carnac.ViewModels
                 s.Top *= (s.RelativeHeight / s.Height);
             }
 
+            var white = System.Drawing.Color.White;
+            var black = System.Drawing.Color.Black;
+
+            var settings = new Settings
+                               {
+                                   FontSize = 40,
+                                   FontColor = new System.Windows.Media.Color { A = white.A, R = white.R, G = white.G, B = white.B },
+                                   ItemBackgroundColor = new System.Windows.Media.Color { A = black.A, R = black.R, G = black.G, B = black.B },
+                                   ItemOpacity = 0.5,
+                                   ItemMaxWidth = 250
+                               };
+
             WindowManager manager = new WindowManager();
-            manager.ShowWindow(new KeyShowViewModel(Keys));
+            manager.ShowWindow(new KeyShowViewModel(Keys, settings));
 
             var timer = new Timer(1000);
             timer.Elapsed += (s, e) => Application.Current.Dispatcher.BeginInvoke((ThreadStart)(Cleanup), DispatcherPriority.Background, null);
