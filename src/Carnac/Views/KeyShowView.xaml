@@ -41,14 +41,11 @@
                         Focusable="False"
                         HorizontalAlignment="Stretch" 
                         BorderThickness="4"
-                        CornerRadius="2" Margin="0, 0, 0, 3"
+                        CornerRadius="15" Margin="0, 0, 0, 3"
                         Padding="2">
                   <Border.Background>
                         <SolidColorBrush Color="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=DataContext.Settings.ItemBackgroundColor}" />
                     </Border.Background>
-                  <Border.BorderBrush>
-                      <SolidColorBrush Color="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=DataContext.Settings.ItemBackgroundColor}" />
-                  </Border.BorderBrush>
                   <Border.Style>
                         <Style>
                             <Style.Triggers>
@@ -78,9 +75,6 @@
                       <TextBlock.Foreground>
                         <SolidColorBrush Color="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=DataContext.Settings.FontColor}" />
                       </TextBlock.Foreground>
-                      <TextBlock.Background>
-                            <SolidColorBrush Color="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}},Path=DataContext.Settings.ItemBackgroundColor}" Opacity="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}},Path=DataContext.Settings.ItemOpacity}" />
-                        </TextBlock.Background>
                     </TextBlock>
 
                 </Border>

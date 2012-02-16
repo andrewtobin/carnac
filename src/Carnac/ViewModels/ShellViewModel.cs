@@ -12,9 +12,9 @@ using System.Windows.Threading;
 using Caliburn.Micro;
 using Carnac.KeyMonitor;
 using System.ComponentModel.Composition;
-using Color = System.Windows.Media.Color;
 using Message = Carnac.Models.Message;
 using Timer = System.Timers.Timer;
+using Analects.SettingsService;
 
 namespace Carnac.ViewModels
 {
@@ -38,6 +38,8 @@ namespace Carnac.ViewModels
         private IDisposable keySubscription;
 
         private readonly Dictionary<int, Process> processes;
+
+        private readonly ISettingsService SettingsService;
 
         public ShellViewModel()
         {
@@ -93,17 +95,25 @@ namespace Carnac.ViewModels
                 s.Top *= (s.RelativeHeight / s.Height);
             }
 
-            var white = System.Drawing.Color.White;
-            var black = System.Drawing.Color.Black;
+            SettingsService = new SettingsService();
 
-            var settings = new Settings
-                               {
-                                   FontSize = 40,
-                                   FontColor = new System.Windows.Media.Color { A = white.A, R = white.R, G = white.G, B = white.B },
-                                   ItemBackgroundColor = new System.Windows.Media.Color { A = black.A, R = black.R, G = black.G, B = black.B },
-                                   ItemOpacity = 0.5,
-                                   ItemMaxWidth = 250
-                               };
+            Settings settings = SettingsService.Get<Settings>("PopupSettings");
+
+            if (settings == null)
+            {
+                var newSettings = new Settings
+                                   {
+                                       FontSize = 40,
+                                       FontColor = "Red",
+                                       ItemBackgroundColor = "Black",
+                                       ItemOpacity = 0.5,
+                                       ItemMaxWidth = 250
+                                   };
+
+                SettingsService.Set("PopupSettings", newSettings);
+                SettingsService.Save();
+                settings = newSettings;
+            }
 
             WindowManager manager = new WindowManager();
             manager.ShowWindow(new KeyShowViewModel(Keys, settings));

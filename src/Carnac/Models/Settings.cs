@@ -12,9 +12,9 @@ namespace Carnac
     {
         public int ItemMaxWidth { get; set; }
         public double ItemOpacity { get; set; }
-        public Color ItemBackgroundColor { get; set; }
+        public string ItemBackgroundColor { get; set; }
         
-        public Color FontColor { get; set; }
+        public string FontColor { get; set; }
         public int FontSize { get; set; }
     }
 }
