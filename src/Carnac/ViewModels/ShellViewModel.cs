@@ -19,14 +19,14 @@ using Analects.SettingsService;
 namespace Carnac.ViewModels
 {
     [Export(typeof(IShell))]
-    public class ShellViewModel :Screen, IShell, IObserver<InterceptKeyEventArgs>
+    public class ShellViewModel : Screen, IShell, IObserver<InterceptKeyEventArgs>
     {
         [DllImport("user32.dll")]
         static extern bool EnumDisplayDevices(string lpDevice, uint iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
 
         [DllImport("User32.dll")]
         static extern bool EnumDisplaySettings(string lpszDeviceName, int iModeNum, ref DEVMODE lpDevMode);
-        
+
         [DllImport("User32.dll")]
         static extern int GetForegroundWindow();
 
@@ -35,11 +35,14 @@ namespace Carnac.ViewModels
 
         public ObservableCollection<DetailedScreen> Screens { get; set; }
 
+        public DetailedScreen SelectedScreen { get; set; }
+
         private IDisposable keySubscription;
 
         private readonly Dictionary<int, Process> processes;
 
         private readonly ISettingsService SettingsService;
+        public Settings Settings { get; set; }
 
         public ShellViewModel()
         {
@@ -49,7 +52,7 @@ namespace Carnac.ViewModels
             Keys = new ObservableCollection<Message>();
             Screens = new ObservableCollection<DetailedScreen>();
 
-            int index = 1;
+            var enumeratedScreens = new List<DetailedScreen>();
             var d = new DISPLAY_DEVICE();
             d.cb = Marshal.SizeOf(d);
             try
@@ -68,7 +71,7 @@ namespace Carnac.ViewModels
                         continue;
 
 
-                    var screen = new DetailedScreen { FriendlyName = x.DeviceString, Index = index++ };
+                    var screen = new DetailedScreen { FriendlyName = x.DeviceString };
 
                     var mode = new DEVMODE();
                     mode.dmSize = (ushort)Marshal.SizeOf(mode);
@@ -77,9 +80,18 @@ namespace Carnac.ViewModels
                         screen.Width = (int)mode.dmPelsWidth;
                         screen.Height = (int)mode.dmPelsHeight;
                         screen.Top = (int)mode.dmPosition.y;
+                        screen.Left = (int)mode.dmPosition.x;
                     }
 
+                    enumeratedScreens.Add(screen);
+                }
+
+                int count = 1;
+                foreach(var screen in enumeratedScreens.OrderBy(s => s.Left))
+                {
+                    screen.Index = count;
                     Screens.Add(screen);
+                    count++;
                 }
             }
             catch (Exception ex)
@@ -97,9 +109,9 @@ namespace Carnac.ViewModels
 
             SettingsService = new SettingsService();
 
-            Settings settings = SettingsService.Get<Settings>("PopupSettings");
+            Settings = SettingsService.Get<Settings>("PopupSettings");
 
-            if (settings == null)
+            if (Settings == null)
             {
                 var newSettings = new Settings
                                    {
@@ -112,15 +124,39 @@ namespace Carnac.ViewModels
 
                 SettingsService.Set("PopupSettings", newSettings);
                 SettingsService.Save();
-                settings = newSettings;
+                Settings = newSettings;
             }
 
+            PlaceScreen();
+
             WindowManager manager = new WindowManager();
-            manager.ShowWindow(new KeyShowViewModel(Keys, settings));
+            manager.ShowWindow(new KeyShowViewModel(Keys, Settings));
 
             var timer = new Timer(1000);
             timer.Elapsed += (s, e) => Application.Current.Dispatcher.BeginInvoke((ThreadStart)(Cleanup), DispatcherPriority.Background, null);
             timer.Start();
+        }
+
+        private void PlaceScreen()
+        {
+            SelectedScreen = Screens.FirstOrDefault(s => s.Index == Settings.Screen);
+            if (SelectedScreen != null)
+            {
+                if (Settings.Placement == 1)
+                {
+                    SelectedScreen.Placement1 = true;
+                    Settings.X = SelectedScreen.Left + 5;
+                    Settings.Y = SelectedScreen.Top;
+                }
+                else if (Settings.Placement == 2)
+                {
+                    SelectedScreen.Placement2 = true;
+                    Settings.X = SelectedScreen.Left + 5;
+                    Settings.Y = SelectedScreen.Top + SelectedScreen.Height - Settings.FontSize - 5;
+                }
+                else if (Settings.Placement == 3) SelectedScreen.Placement3 = true;
+                else if (Settings.Placement == 4) SelectedScreen.Placement4 = true;
+            }
         }
 
         private readonly TimeSpan fiveseconds = TimeSpan.FromSeconds(5);
@@ -187,14 +223,14 @@ namespace Carnac.ViewModels
             {
                 m = new Message
                         {
-                            StartingTime = DateTime.Now, 
+                            StartingTime = DateTime.Now,
                             ProcessName = process.ProcessName
                         };
-                
+
                 CurrentMessage = m;
                 Keys.Add(m);
             }
-            else 
+            else
                 m = CurrentMessage;
 
             m.LastMessage = DateTime.Now;
@@ -203,8 +239,26 @@ namespace Carnac.ViewModels
             Console.WriteLine("\n" + m.Count + " - " + m.Text);
         }
 
-        public void OnError(Exception error){}
-        public void OnCompleted(){}
-    }
+        public void OnError(Exception error) { }
+        public void OnCompleted() { }
 
+        public void SaveSettingsGeneral() { SaveSettings(); }
+
+        public void SaveSettings()
+        {
+
+            Settings.Screen = SelectedScreen.Index;
+            if (SelectedScreen.Placement1) Settings.Placement = 1;
+            else if (SelectedScreen.Placement2) Settings.Placement = 2;
+            else if (SelectedScreen.Placement3) Settings.Placement = 3;
+            else if (SelectedScreen.Placement4) Settings.Placement = 4;
+            else Settings.Placement = 0;
+
+            PlaceScreen();
+
+            SettingsService.Set("PopupSettings", Settings);
+            SettingsService.Save();
+
+        }
+    }
 }

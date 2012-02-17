@@ -3,7 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
+        xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         MouseDown="OnMouseDown"
         ShowTitleBar="False"
         mc:Ignorable="d"
@@ -27,36 +29,39 @@
     </Window.Foreground>
     <TabControl Margin="0,12">
         <TabItem Header="General">
-            <ListBox ItemsSource="{Binding Screens}" BorderBrush="{x:Null}" Background="{x:Null}" VerticalAlignment="Top">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" IsItemsHost="True"/>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="VerticalAlignment" Value="Bottom" />
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Margin="5,5,5,5">
-                            <Grid HorizontalAlignment="Left" Height="{Binding RelativeHeight}" Margin="0" Width="{Binding RelativeWidth}">
-                                <Rectangle Fill="{DynamicResource AccentColorBrush}"/>
-                                <TextBlock FontWeight="SemiBold" TextWrapping="Wrap" Foreground="White" FontSize="96" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Index}" />
-                                <RadioButton x:Name="rbTL" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                                <RadioButton x:Name="rbBL" Content="" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
-                                <RadioButton x:Name="rbTR" Content="" HorizontalAlignment="Right" VerticalAlignment="Top" />
-                                <RadioButton x:Name="rbBR" Content="" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
-                            </Grid>
-                            <TextBlock FontWeight="SemiBold" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding FriendlyName}" FontSize="18.667"/>
-                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="14">
+            <StackPanel Orientation="Vertical">
+                <ListBox x:Name="ScreensBox" ItemsSource="{Binding Screens}" SelectedItem="{Binding SelectedScreen}" BorderBrush="{x:Null}" Background="{x:Null}" VerticalAlignment="Top">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" IsItemsHost="True"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="VerticalAlignment" Value="Bottom" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="5,5,5,5" IsEnabled="{Binding ScreensBox.IsSelected}">
+                                <Grid HorizontalAlignment="Left" Height="{Binding RelativeHeight}" Margin="0" Width="{Binding RelativeWidth}">
+                                    <Rectangle Fill="{DynamicResource AccentColorBrush}"/>
+                                    <TextBlock FontWeight="SemiBold" TextWrapping="Wrap" Foreground="White" FontSize="96" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Index}" />
+                                    <RadioButton x:Name="rbTL" Content="1" IsChecked="{Binding Placement1}" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                    <RadioButton x:Name="rbBL" Content="2" IsChecked="{Binding Placement2}" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+                                    <RadioButton x:Name="rbTR" Content="3" IsChecked="{Binding Placement3}" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                    <RadioButton x:Name="rbBR" Content="4" IsChecked="{Binding Placement4}" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+                                </Grid>
+                                <TextBlock FontWeight="SemiBold" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding FriendlyName}" FontSize="18.667"/>
+                                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="14">
                             <Run Text="{Binding Width}"/> x <Run Text="{Binding Height}"/>
-                            </TextBlock>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button x:Name="SaveSettingsGeneral" Content="Save" Width="50" HorizontalAlignment="Right" Margin="0 5 50 5" />
+            </StackPanel>
         </TabItem>
         <TabItem Header="Keys">
             <ItemsControl Margin="12" ItemsSource="{Binding Keys}" DisplayMemberPath="Text" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -67,7 +72,36 @@
         </TabItem>
         <TabItem Header="Recording">
         </TabItem>
-        <TabItem Header="Appearance"/>
+        <TabItem Header="Appearance">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" FontWeight="Bold" Text="Popup Text Width" Margin="10 0 0 0" Width="200" VerticalAlignment="Center" />
+                    <Slider x:Name="Settings_ItemMaxWidth" Width="200" Minimum="0" Maximum="1000" SmallChange="10" LargeChange="50" TickFrequency="10" IsSnapToTickEnabled="True" Margin="5 0 20 0" />
+                    <TextBox Text="{Binding Settings.ItemMaxWidth}" Width="50" Foreground="White" HorizontalAlignment="Center"  Margin="0 0 5 5" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" FontWeight="Bold" Text="Popup Opacity" Margin="10 0 0 0" Width="200" VerticalAlignment="Center" />
+                    <Slider x:Name="Settings_ItemOpacity" Width="200" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.1" TickFrequency="0.05" IsSnapToTickEnabled="True" Margin="5 0 20 0" />
+                    <TextBox Text="{Binding Settings.ItemOpacity}" Width="50" Foreground="White" HorizontalAlignment="Center"  Margin="0 0 5 5" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" FontWeight="Bold" Text="Font Size" Margin="10 0 0 0" Width="200" VerticalAlignment="Center" />
+                    <Slider x:Name="Settings_FontSize" Width="200" Minimum="8" Maximum="48" SmallChange="1" LargeChange="2" TickFrequency="1" IsSnapToTickEnabled="True" Margin="5 0 20 0" />
+                    <TextBox Text="{Binding Settings.FontSize}" Width="50" Foreground="White" HorizontalAlignment="Center"  Margin="0 0 5 5" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" FontWeight="Bold" Text="Font Size" Margin="10 0 0 0" Width="200" VerticalAlignment="Center" />
+                    <extToolkit:ColorPicker SelectedColor="{Binding Settings.FontColor}" Width="200"  Margin="5 5 20 5" />
+                    <TextBox Text="{Binding Settings.FontColor}" Width="100" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"  Margin="0 0 5 0" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" FontWeight="Bold" Text="Background Color" Margin="10 0 0 0" Width="200" VerticalAlignment="Center" />
+                    <extToolkit:ColorPicker SelectedColor="{Binding Settings.ItemBackgroundColor}" Width="200"  Margin="5 5 20 5" />
+                    <TextBox Text="{Binding Settings.ItemBackgroundColor}" Width="100" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"  Margin="0 0 5 0" />
+                </StackPanel>
+                <Button x:Name="SaveSettings" Content="Save" Width="50" HorizontalAlignment="Right" Margin="0 5 50 5" />
+            </StackPanel>
+        </TabItem>
         <TabItem Header="About"/>
     </TabControl>
 </Controls:MetroWindow>

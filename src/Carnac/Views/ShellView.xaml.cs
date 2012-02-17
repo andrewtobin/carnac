@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Carnac.ViewModels;
 
 namespace Carnac.Views
 {
