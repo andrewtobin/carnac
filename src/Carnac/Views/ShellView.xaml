@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
-        xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         MouseDown="OnMouseDown"
         ShowTitleBar="False"
         mc:Ignorable="d"
@@ -99,7 +98,10 @@
                     <extToolkit:ColorPicker SelectedColor="{Binding Settings.ItemBackgroundColor}" Width="200"  Margin="5 5 20 5" />
                     <TextBox Text="{Binding Settings.ItemBackgroundColor}" Width="100" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"  Margin="0 0 5 0" />
                 </StackPanel>
-                <Button x:Name="SaveSettings" Content="Save" Width="50" HorizontalAlignment="Right" Margin="0 5 50 5" />
+                <StackPanel Orientation="Horizontal"  Margin="0 5 50 5" HorizontalAlignment="Right">
+                <Button x:Name="SetDefaultSettings" Content="Reset to Defaults" Width="150" Margin="0 0 5 0" />
+                <Button x:Name="SaveSettings" Content="Save" Width="50" />
+                </StackPanel>
             </StackPanel>
         </TabItem>
         <TabItem Header="About"/>

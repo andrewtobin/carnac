@@ -23,6 +23,8 @@ namespace Carnac
         public double X { get; set; }
         public double Y { get; set; }
 
+        public double Height { get; set; }
+
         public string SortDescription
         {
             get { return Placement == 1 || Placement == 3 ? "Ascending" : "Descending"; }

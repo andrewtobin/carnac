@@ -52,7 +52,7 @@ namespace Carnac.ViewModels
             Keys = new ObservableCollection<Message>();
             Screens = new ObservableCollection<DetailedScreen>();
 
-            var enumeratedScreens = new List<DetailedScreen>();
+            int index = 1;
             var d = new DISPLAY_DEVICE();
             d.cb = Marshal.SizeOf(d);
             try
@@ -71,7 +71,7 @@ namespace Carnac.ViewModels
                         continue;
 
 
-                    var screen = new DetailedScreen { FriendlyName = x.DeviceString };
+                    var screen = new DetailedScreen { FriendlyName = x.DeviceString, Index = index++ };
 
                     var mode = new DEVMODE();
                     mode.dmSize = (ushort)Marshal.SizeOf(mode);
@@ -83,15 +83,7 @@ namespace Carnac.ViewModels
                         screen.Left = (int)mode.dmPosition.x;
                     }
 
-                    enumeratedScreens.Add(screen);
-                }
-
-                int count = 1;
-                foreach(var screen in enumeratedScreens.OrderBy(s => s.Left))
-                {
-                    screen.Index = count;
                     Screens.Add(screen);
-                    count++;
                 }
             }
             catch (Exception ex)
@@ -113,18 +105,8 @@ namespace Carnac.ViewModels
 
             if (Settings == null)
             {
-                var newSettings = new Settings
-                                   {
-                                       FontSize = 40,
-                                       FontColor = "Red",
-                                       ItemBackgroundColor = "Black",
-                                       ItemOpacity = 0.5,
-                                       ItemMaxWidth = 250
-                                   };
-
-                SettingsService.Set("PopupSettings", newSettings);
-                SettingsService.Save();
-                Settings = newSettings;
+                Settings = new Settings();
+                SetDefaultSettings();
             }
 
             PlaceScreen();
@@ -135,28 +117,6 @@ namespace Carnac.ViewModels
             var timer = new Timer(1000);
             timer.Elapsed += (s, e) => Application.Current.Dispatcher.BeginInvoke((ThreadStart)(Cleanup), DispatcherPriority.Background, null);
             timer.Start();
-        }
-
-        private void PlaceScreen()
-        {
-            SelectedScreen = Screens.FirstOrDefault(s => s.Index == Settings.Screen);
-            if (SelectedScreen != null)
-            {
-                if (Settings.Placement == 1)
-                {
-                    SelectedScreen.Placement1 = true;
-                    Settings.X = SelectedScreen.Left + 5;
-                    Settings.Y = SelectedScreen.Top;
-                }
-                else if (Settings.Placement == 2)
-                {
-                    SelectedScreen.Placement2 = true;
-                    Settings.X = SelectedScreen.Left + 5;
-                    Settings.Y = SelectedScreen.Top + SelectedScreen.Height - Settings.FontSize - 5;
-                }
-                else if (Settings.Placement == 3) SelectedScreen.Placement3 = true;
-                else if (Settings.Placement == 4) SelectedScreen.Placement4 = true;
-            }
         }
 
         private readonly TimeSpan fiveseconds = TimeSpan.FromSeconds(5);
@@ -260,5 +220,43 @@ namespace Carnac.ViewModels
             SettingsService.Save();
 
         }
+
+        public void SetDefaultSettings()
+        {
+            Settings.FontSize = 40;
+            Settings.FontColor = "White";
+            Settings.ItemBackgroundColor = "Black";
+            Settings.ItemOpacity = 0.5;
+            Settings.ItemMaxWidth = 250;
+
+            SaveSettings();
+        }
+
+        private void PlaceScreen()
+        {
+            if (Screens == null) return;
+
+            SelectedScreen = Screens.FirstOrDefault(s => s.Index == Settings.Screen);
+            
+            if (SelectedScreen == null) return;
+            
+            if (Settings.Placement == 1)
+            {
+                //SelectedScreen.Placement1 = true;
+                //Settings.X = SelectedScreen.Left + 5;
+                //Settings.Y = SelectedScreen.Top;
+            }
+            else if (Settings.Placement == 2)
+            {
+                SelectedScreen.Placement2 = true;
+                Settings.X = SelectedScreen.Left;
+                Settings.Y = 0; // SelectedScreen.Top + SelectedScreen.Height - Settings.FontSize;
+                Settings.Height = SelectedScreen.Height;
+            }
+            else if (Settings.Placement == 3) SelectedScreen.Placement3 = true;
+            else if (Settings.Placement == 4) SelectedScreen.Placement4 = true;
+        }
+
+
     }
 }
